@@ -1,22 +1,16 @@
-# Example to create a bios compatible gpt partition
 { lib, ... }:
 {
   disko.devices = {
     disk.disk1 = {
-      device = lib.mkDefault "/dev/sda";
+      device = "/dev/nvme0n1";
       type = "disk";
       content = {
-        type = "gpt";
+        type = "gpt";  # Using GPT as the disklabel type
         partitions = {
           boot = {
             name = "boot";
-            size = "1M";
-            type = "EF02";
-          };
-          esp = {
-            name = "ESP";
-            size = "500M";
-            type = "EF00";
+            size = "512M";  # Boot partition size
+            type = "8300";  # Type for Linux filesystem (MBR)
             content = {
               type = "filesystem";
               format = "vfat";
@@ -25,28 +19,12 @@
           };
           root = {
             name = "root";
-            size = "100%";
-            content = {
-              type = "lvm_pv";
-              vg = "pool";
-            };
-          };
-        };
-      };
-    };
-    lvm_vg = {
-      pool = {
-        type = "lvm_vg";
-        lvs = {
-          root = {
-            size = "100%FREE";
+            size = "100%";  # The remaining space
             content = {
               type = "filesystem";
               format = "ext4";
               mountpoint = "/";
-              mountOptions = [
-                "defaults"
-              ];
+              mountOptions = [ "defaults" ];
             };
           };
         };
